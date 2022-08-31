@@ -1,14 +1,14 @@
-import { Fragment } from "react"
-import { useRouter } from "next/router"
+import { Fragment } from "react";
+import { useRouter } from "next/router";
 
-import { getFilteredEvents } from "../../helper/api-utlis"
-import EventList from "../../components/events/event-list"
-import ResultsTitle from "../../components/events/results-title"
-import Button from "../../components/ui/button"
-import ErrorAlert from "../../components/ui/error-alert"
+import { getFilteredEvents } from "../../helper/api-utlis";
+import EventList from "../../components/events/event-list";
+import ResultsTitle from "../../components/events/results-title";
+import Button from "../../components/ui/button";
+import ErrorAlert from "../../components/ui/error-alert";
 
 function FilteredEventsPage(props) {
-  const router = useRouter()
+  const router = useRouter();
 
   // const filterData = router.query.slug
 
@@ -32,10 +32,10 @@ function FilteredEventsPage(props) {
           <Button link="/events">Show All Events</Button>
         </div>
       </>
-    )
+    );
   }
 
-  const filteredEvents = props.events
+  const filteredEvents = props.events;
 
   if (!filteredEvents || filteredEvents.length === 0) {
     return (
@@ -47,32 +47,33 @@ function FilteredEventsPage(props) {
           <Button link="/events">Show All Events</Button>
         </div>
       </Fragment>
-    )
+    );
   }
 
-  const date = new Date(props.date.year, props.date.month - 1)
+  const date = new Date(props.date.year, props.date.month - 1);
 
   return (
     <Fragment>
       <ResultsTitle date={date} />
       <EventList items={filteredEvents} />
     </Fragment>
-  )
+  );
 }
+
 /* 
 - Next.js will pre-render this page on each request using 
 - the data returned by getServerSideProps. 
 */
 export async function getServerSideProps(context) {
-  const { params } = context
+  const { params } = context;
 
-  console.log("CONTEXT", context.params)
-  const filterData = params.slug
-  const filteredYear = filterData[0]
-  const filteredMonth = filterData[1]
+  // console.log("CONTEXT", context.params)
+  const filterData = params.slug;
+  const filteredYear = filterData[0];
+  const filteredMonth = filterData[1];
 
-  const numYear = +filteredYear
-  const numMonth = +filteredMonth
+  const numYear = +filteredYear;
+  const numMonth = +filteredMonth;
 
   if (
     isNaN(numYear) ||
@@ -91,13 +92,13 @@ export async function getServerSideProps(context) {
       // redirect: {
       //   destination: "/error",
       // },
-    }
+    };
   }
 
   const filteredEvents = await getFilteredEvents({
     year: numYear,
     month: numMonth,
-  })
+  });
 
   // console.log("filteredEvents", filteredEvents)
   return {
@@ -108,7 +109,7 @@ export async function getServerSideProps(context) {
         month: numMonth,
       },
     },
-  }
+  };
 }
 
-export default FilteredEventsPage
+export default FilteredEventsPage;
