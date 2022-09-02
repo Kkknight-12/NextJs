@@ -1,34 +1,293 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# API Routes Project
 
-## Getting Started
+### News Letter
 
-First, run the development server:
+```jsx
+import { useRef } from "react"
 
-```bash
-npm run dev
-# or
-yarn dev
+function NewsletterRegistration() {
+  const emailInputRef = useRef()
+  function registrationHandler(event) {
+    event.preventDefault()
+
+    const enteredEmail = emailInputRef.current.value
+    // fetch user input (state or refs)
+    // optional: validate input
+    // send valid data to API
+    fetch("/api/newsletter", {
+      method: "POST",
+      body: JSON.stringify({ email: enteredEmail }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => console.log(data))
+  }
+
+  return (
+    <section className={classes.newsletter}>
+     
+      <form onSubmit={registrationHandler}>
+        
+      </form>
+    </section>
+  )
+}
+
+export default NewsletterRegistration
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+api/newletter.js
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+```jsx
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+async function handler(req, resp) {
+  if (req.method === "POST") {
+    const { email: userEmail } = req.body
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+    if (!userEmail || !userEmail.includes("@")) {
+      resp.status(422).json({ message: "Invalid email address" })
+      return
+    }
 
-## Learn More
+    resp.status(201).json({ message: "Singed Up!" })
+  }
+}
 
-To learn more about Next.js, take a look at the following resources:
+export default handler
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Comment API
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```jsx
 
-## Deploy on Vercel
+function Comments(props) {
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+			const [comments, setComments] = useState([])
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+				// GET
+			  useEffect(() => {
+			    if (showComments) {
+			      fetch("/api/comments/" + eventId)
+			        .then((response) => response.json())
+			        .then((data) => {
+			          setComments(data.comments)
+			        })
+			    }
+			  }, [showComments])
+
+			// POST
+			function addCommentHandler(commentData) {
+			    // send data to API
+			    fetch("/api/comments/" + eventId, {
+			      method: "POST",
+			      body: JSON.stringify(commentData),
+			      headers: {
+			        "Content-Type": "application/json",
+			      },
+			    })
+			      .then((response) => response.json())
+			      .then((data) => console.log(data))
+			  }
+			
+
+		return (
+					<NewComment onAddComment={addCommentHandler} />
+					<CommentList items={comments} />
+		)
+
+}
+```
+
+api./comments/[eventId.js]
+
+```jsx
+
+async function handler(req, resp) {
+  const eventId = req.query.eventId
+
+  if (req.method === "POST") {
+    const { email, name, text } = req.body
+
+    // if invalid input
+    if (
+      !email.includes("@") ||
+      !name ||
+      name.trim() === "" ||
+      !text ||
+      text.trim === ""
+    ) {
+      resp.status(422).json({ message: "Invalid input" })
+      client.close()
+      return
+    }
+
+    console.log(email, name, text)
+    const newComment = {
+      email,
+      name,
+      text,
+      id: new Date().toISOString(),
+    }
+   resp.status(201).json({ message: "Added Comment.", comment: newComment })
+  }
+
+  if (req.method === "GET") {
+    dummyList = [ { id: 'c1', name: 'Max ', text: 'A first comment!' } ]
+  
+		resp.status(200).json({ comments: dummyList })
+  }
+
+}
+export default handler
+```
+
+### Setting up MongoDb Database
+
+install
+
+```jsx
+npm i mpngodb
+```
+
+helpers/db-utils.js
+
+```jsx
+import { MongoClient } from "mongodb"
+
+export async function **connectDatabase**() {
+  const client = await MongoClient.connect(
+    "mongodb+srv://nextjsMongoDb:nextjsMongoDb@cluster0.mdte5.mongodb.net/events?retryWrites=true&w=majority"
+  )
+  return client
+}
+
+export async function **insertDocument**(client, collection, document) {
+  const db = client.db()
+
+  const result = await db.collection(collection).insertOne(document)
+  return result
+}
+
+export async function getAllDocuments(client, collection, sort) {
+  const db = client.db()
+
+  const documents = await db
+    .collection(collection)
+    .find()
+    .sort(sort) // sort in descending order | + 1 for ascedning
+    .toArray()
+
+  return document
+}
+```
+
+```jsx
+import { **connectDatabase**, **insertDocument** } from "../../helpers/db-util"
+
+async function handler(req, resp) {
+  if (req.method === "POST") {
+    const { email: userEmail } = req.body
+
+    if (!userEmail || !userEmail.includes("@")) {
+      resp.status(422).json({ message: "Invalid email address" })
+      return
+    }
+
+    let client
+
+    try {
+      client = await **connectDatabase**()
+    } catch (error) {
+      resp.status(500).json({ message: "Connecting to the database failed!" })
+      return
+    }
+
+    try {
+      await **insertDocument**(client, "newsletter", { email: userEmail })
+      client.close()
+    } catch (error) {
+      resp.status(500).json({ message: "Inserting the data failed" })
+      return
+    }
+
+    resp.status(201).json({ message: "Singed Up!" })
+  }
+}
+
+export default handler
+```
+
+### Inserting Comment in Database and Getting Data from Database
+
+api/comments/[eventId.js]
+
+```jsx
+import {
+  connectDatabase,
+  insertDocument,
+  getAllDocuments,
+} from "../../../helpers/db-util";
+
+async function handler(req, resp) {
+  const eventId = req.query.eventId;
+
+  let client;
+  try {
+    client = await **connectDatabase**();
+  } catch (error) {
+    resp.status(500).json({ message: "Connecting to the database failed!" });
+    return;
+  }
+
+  if (req.method === "POST") {
+    const { email, name, text } = req.body;
+
+    // if invalid input
+    if (
+      !email.includes("@") ||
+      !name ||
+      name.trim() === "" ||
+      !text ||
+      text.trim === ""
+    ) {
+      resp.status(422).json({ message: "Invalid input" });
+      client.close();
+      return;
+    }
+
+    console.log(email, name, text);
+    const newComment = {
+      email,
+      name,
+      text,
+      eventId,
+    };
+
+    let result;
+
+    try {
+      result = await **insertDocument**(client, "comments", newComment);
+      newComment._id =
+        result.insertedId[
+          resp
+            .status(201)
+            .json({ message: "Added Comment.", comment: newComment })
+        ];
+    } catch (error) {
+      resp.status(500).json({ message: "inserting comment failed" });
+    }
+  }
+  if (req.method === "GET") {
+    try {
+      const documents = **getAllDocuments**(client, "comments", { _id: -1 });
+      resp.status(200).json({ comments: documents });
+    } catch (error) {
+      resp.status(500).json({ message: "Getting comments failed" });
+    }
+  }
+  client.close();
+}
+export default handler;
+```
