@@ -1,5 +1,5 @@
-import { buttonVariants } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { buttonVariants } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
 import {
   Sheet,
   SheetContent,
@@ -7,16 +7,16 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { formatPrice } from "@/lib/utils";
-import { ShoppingCart } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import * as React from "react";
+} from '@/components/ui/sheet'
+import { formatPrice } from '@/lib/utils'
+import { ShoppingCart } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import * as React from 'react'
 
 export const Cart = () => {
-  const itemCount = 0;
-  const fee = 1;
+  const itemCount = 0
+  const fee = 1
 
   return (
     <Sheet>
@@ -71,9 +71,9 @@ export const Cart = () => {
                   <Link
                     href="/cart"
                     className={buttonVariants({
-                      variant: "secondary",
-                      size: "lg",
-                      className: "w-full",
+                      variant: 'secondary',
+                      size: 'lg',
+                      className: 'w-full',
                     })}
                   >
                     Continue to Checkout
@@ -101,9 +101,9 @@ export const Cart = () => {
               <Link
                 href="/products"
                 className={buttonVariants({
-                  variant: "link",
-                  size: "sm",
-                  className: "text-sm text-muted-foreground",
+                  variant: 'link',
+                  size: 'sm',
+                  className: 'text-sm text-muted-foreground',
                 })}
               >
                 Add items to your cart to checkout
@@ -113,5 +113,5 @@ export const Cart = () => {
         )}
       </SheetContent>
     </Sheet>
-  );
-};
+  )
+}

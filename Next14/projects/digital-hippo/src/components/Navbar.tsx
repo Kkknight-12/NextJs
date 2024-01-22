@@ -1,14 +1,14 @@
 // @flow
-import { Cart } from "@/components/Cart";
-import { Icons } from "@/components/Icons";
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
-import NavItems from "@/components/NavItems";
-import { buttonVariants } from "@/components/ui/button";
-import Link from "next/link";
-import * as React from "react";
+import { Cart } from '@/components/Cart'
+import { Icons } from '@/components/Icons'
+import MaxWidthWrapper from '@/components/MaxWidthWrapper'
+import NavItems from '@/components/NavItems'
+import { buttonVariants } from '@/components/ui/button'
+import Link from 'next/link'
+import * as React from 'react'
 
 const Navbar = () => {
-  const user = null;
+  const user = null
 
   return (
     <div className="bg-white sticky z-50 top-0 inset-x-0 h-16">
@@ -19,7 +19,7 @@ const Navbar = () => {
               {/* TODO: Mobile nav */}
 
               <div className="ml-4 flex lg:li-0">
-                <Link href={"/"}>
+                <Link href={'/'}>
                   <Icons.logo className="w-8 h-8" />
                 </Link>
               </div>
@@ -36,7 +36,7 @@ const Navbar = () => {
                     <Link
                       href="/sign-in"
                       className={buttonVariants({
-                        variant: "ghost",
+                        variant: 'ghost',
                       })}
                     >
                       Sign in
@@ -48,12 +48,12 @@ const Navbar = () => {
                   )}
 
                   {user ? (
-                    "user"
+                    'user'
                   ) : (
                     <Link
                       href="/sign-up"
                       className={buttonVariants({
-                        variant: "ghost",
+                        variant: 'ghost',
                       })}
                     >
                       Create account
@@ -100,7 +100,7 @@ const Navbar = () => {
         </MaxWidthWrapper>
       </header>
     </div>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar
